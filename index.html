@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced Management Dashboard</title>
+
+<style>
+
+:root{
+--bg:#f4f6f9;
+--card:#fff;
+--text:#222;
+}
+
+body.dark{
+--bg:#1e1e2f;
+--card:#2c2c3e;
+--text:#fff;
+}
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:var(--bg);
+color:var(--text);
+}
+
+/* HEADER */
+header{
+background:linear-gradient(90deg,#2c3e50,#3498db);
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.toggle{
+cursor:pointer;
+background:white;
+color:black;
+padding:5px 10px;
+border-radius:5px;
+}
+
+/* GRID */
+.container{
+width:95%;
+margin:20px auto;
+}
+
+/* DASHBOARD */
+.dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+background:var(--card);
+padding:20px;
+border-radius:10px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card h2{
+margin:0;
+font-size:28px;
+color:#3498db;
+}
+
+/* FORM */
+input,select{
+padding:8px;
+margin:5px;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+/* BUTTON */
+button{
+padding:8px 12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+color:white;
+}
+
+.btn-blue{background:#3498db;}
+.btn-green{background:#27ae60;}
+.btn-red{background:#e74c3c;}
+.btn-purple{background:#8e44ad;}
+
+/* TABLE */
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th{
+background:#34495e;
+color:white;
+padding:10px;
+}
+
+td{
+padding:8px;
+text-align:center;
+}
+
+tr:nth-child(even){background:#eee;}
+
+body.dark tr:nth-child(even){background:#3a3a4a;}
+
+/* SEARCH */
+.search{
+margin:10px 0;
+padding:8px;
+width:250px;
+}
+
+/* IMAGE PREVIEW */
+.preview{
+max-width:100px;
+cursor:pointer;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal img{
+max-width:80%;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<span>📊 Smart Management Dashboard</span>
+<button class="toggle" onclick="toggleMode()">🌙 Mode</button>
+</header>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+<div class="card"><h2 id="totalRates">0</h2>Total Rates</div>
+<div class="card"><h2 id="totalSuppliers">0</h2>Suppliers</div>
+<div class="card"><h2 id="totalCategories">0</h2>Categories</div>
+<div class="card"><h2 id="totalFiles">0</h2>Files</div>
+</div>
+
+<!-- SEARCH -->
+<input class="search" id="search" placeholder="Search..." onkeyup="displayRates()">
+
+<!-- ADD RATE -->
+<div class="card">
+<h3>Add Rate</h3>
+
+<select id="category"></select>
+<input id="supplier" placeholder="Supplier">
+<input id="item" placeholder="Item">
+<input id="rate" placeholder="Rate">
+
+<button class="btn-blue" onclick="addRate()">Add</button>
+</div>
+
+<!-- RATE TABLE -->
+<div class="card">
+<h3>Rate List</h3>
+<table id="rateTable">
+<thead>
+<tr>
+<th>Sr</th><th>Category</th><th>Supplier</th><th>Item</th><th>Rate</th><th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<!-- FILE UPLOAD -->
+<div class="card">
+<h3>Upload File</h3>
+<select id="fileCategory"></select>
+<input id="fileSupplier" placeholder="Supplier">
+<input type="file" id="fileInput">
+<button class="btn-blue" onclick="uploadFile()">Upload</button>
+</div>
+
+<!-- FILE TABLE -->
+<div class="card">
+<h3>Files</h3>
+<table id="fileTable">
+<thead>
+<tr>
+<th>Category</th><th>Supplier</th><th>File</th><th>Preview</th><th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+</div>
+
+<!-- IMAGE MODAL -->
+<div class="modal" id="modal" onclick="this.style.display='none'">
+<img id="modalImg">
+</div>
+
+<script>
+
+let categories = JSON.parse(localStorage.getItem("categories")) || ["Foam","Wood"];
+let rates = JSON.parse(localStorage.getItem("rates")) || [];
+let files = JSON.parse(localStorage.getItem("files")) || [];
+
+// DARK MODE
+function toggleMode(){
+document.body.classList.toggle("dark");
+}
+
+// UPDATE DASHBOARD
+function updateDashboard(){
+document.getElementById("totalRates").innerText=rates.length;
+document.getElementById("totalSuppliers").innerText=new Set(rates.map(r=>r.supplier)).size;
+document.getElementById("totalCategories").innerText=categories.length;
+document.getElementById("totalFiles").innerText=files.length;
+}
+
+// CATEGORY
+function loadCategories(){
+let c1=document.getElementById("category");
+let c2=document.getElementById("fileCategory");
+
+c1.innerHTML=""; c2.innerHTML="";
+categories.forEach(c=>{
+c1.innerHTML+=`<option>${c}</option>`;
+c2.innerHTML+=`<option>${c}</option>`;
+});
+}
+
+// ADD RATE
+function addRate(){
+let now=new Date();
+rates.push({
+category:category.value,
+supplier:supplier.value,
+item:item.value,
+rate:rate.value
+});
+localStorage.setItem("rates",JSON.stringify(rates));
+displayRates();
+updateDashboard();
+}
+
+// DISPLAY RATE
+function displayRates(){
+let search=document.getElementById("search").value.toLowerCase();
+let tbody=document.querySelector("#rateTable tbody");
+tbody.innerHTML="";
+let sr=1;
+
+rates.forEach((r,i)=>{
+if(r.item.toLowerCase().includes(search)||r.supplier.toLowerCase().includes(search)){
+tbody.innerHTML+=`
+<tr>
+<td>${sr++}</td>
+<td>${r.category}</td>
+<td>${r.supplier}</td>
+<td>${r.item}</td>
+<td>${r.rate}</td>
+<td><button class="btn-red" onclick="deleteRate(${i})">Delete</button></td>
+</tr>`;
+}
+});
+}
+
+// DELETE RATE
+function deleteRate(i){
+rates.splice(i,1);
+localStorage.setItem("rates",JSON.stringify(rates));
+displayRates();
+updateDashboard();
+}
+
+// UPLOAD FILE
+function uploadFile(){
+let file=fileInput.files[0];
+let reader=new FileReader();
+
+reader.onload=function(e){
+files.push({
+category:fileCategory.value,
+supplier:fileSupplier.value,
+name:file.name,
+data:e.target.result
+});
+localStorage.setItem("files",JSON.stringify(files));
+displayFiles();
+updateDashboard();
+};
+reader.readAsDataURL(file);
+}
+
+// DISPLAY FILES
+function displayFiles(){
+let tbody=document.querySelector("#fileTable tbody");
+tbody.innerHTML="";
+
+files.forEach((f,i)=>{
+let preview="";
+if(f.data.includes("image")){
+preview=`<img src="${f.data}" class="preview" onclick="showImg('${f.data}')">`;
+}
+
+tbody.innerHTML+=`
+<tr>
+<td>${f.category}</td>
+<td>${f.supplier}</td>
+<td>${f.name}</td>
+<td>${preview}</td>
+<td>
+<button class="btn-blue" onclick="downloadFile(${i})">DL</button>
+<button class="btn-red" onclick="deleteFile(${i})">X</button>
+</td>
+</tr>`;
+});
+}
+
+// IMAGE POPUP
+function showImg(src){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalImg").src=src;
+}
+
+// DOWNLOAD
+function downloadFile(i){
+let f=files[i];
+let a=document.createElement("a");
+a.href=f.data;
+a.download=f.name;
+a.click();
+}
+
+// DELETE FILE
+function deleteFile(i){
+files.splice(i,1);
+localStorage.setItem("files",JSON.stringify(files));
+displayFiles();
+updateDashboard();
+}
+
+// INIT
+loadCategories();
+displayRates();
+displayFiles();
+updateDashboard();
+
+</script>
+
+</body>
+</html>
