@@ -1,145 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Advanced Management Dashboard</title>
+<title>Carton Calculation Software</title>
 
 <style>
 
-:root{
---bg:#f4f6f9;
---card:#fff;
---text:#222;
-}
-
-body.dark{
---bg:#1e1e2f;
---card:#2c2c3e;
---text:#fff;
-}
-
+/* BACKGROUND */
 body{
-margin:0;
-font-family:Segoe UI;
-background:var(--bg);
-color:var(--text);
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(120deg,#e0eafc,#cfdef3);
+}
+
+/* LAYOUT */
+.wrapper{
+    display:flex;
+    height:100vh;
+}
+
+/* LEFT PANEL FIX */
+.sidebar{
+    width:450px;
+    background:#fff;
+    border-right:2px solid #ddd;
+    height:100vh;
+    overflow-y:auto;
 }
 
 /* HEADER */
-header{
-background:linear-gradient(90deg,#2c3e50,#3498db);
-color:white;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+.header{
+    background:#ffc107;
+    padding:12px;
+    text-align:center;
+    font-weight:bold;
+    position:sticky;
+    top:0;
 }
 
-.toggle{
-cursor:pointer;
-background:white;
-color:black;
-padding:5px 10px;
-border-radius:5px;
+/* RATE TABLE */
+.rate-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    table-layout:fixed;
 }
 
-/* GRID */
-.container{
-width:95%;
-margin:20px auto;
+.rate-table th{
+    background:#343a40;
+    color:#fff;
+    padding:8px;
+    position:sticky;
+    top:42px;
 }
 
-/* DASHBOARD */
-.dashboard{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-margin-bottom:20px;
+.rate-table td{
+    padding:6px;
+    border:1px solid #ddd;
 }
 
+.rate-table tr:hover{
+    background:#eef7ff;
+    cursor:pointer;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* CLOCK RIGHT */
+.clock-box{
+    position:absolute;
+    top:15px;
+    right:20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* CLOCK */
+.analog-clock{
+    width:190px;
+    height:190px;
+    border:5px solid #2c3e50;
+    border-radius:50%;
+    position:relative;
+    background:#fff;
+}
+
+/* NUMBERS */
+.number{
+    position:absolute;
+    width:100%;
+    height:100%;
+    text-align:center;
+    transform-origin:center;
+    font-weight:bold;
+}
+
+.number span{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.number12{transform:rotate(0deg);}
+.number1{transform:rotate(30deg);}
+.number2{transform:rotate(60deg);}
+.number3{transform:rotate(90deg);}
+.number4{transform:rotate(120deg);}
+.number5{transform:rotate(150deg);}
+.number6{transform:rotate(180deg);}
+.number7{transform:rotate(210deg);}
+.number8{transform:rotate(240deg);}
+.number9{transform:rotate(270deg);}
+.number10{transform:rotate(300deg);}
+.number11{transform:rotate(330deg);}
+
+/* HANDS */
+.hand{
+    position:absolute;
+    bottom:50%;
+    left:50%;
+    transform-origin:bottom;
+    transform:translateX(-50%);
+}
+
+.hour{height:50px;width:5px;background:#000;}
+.minute{height:65px;width:3px;background:#333;}
+.second{height:75px;width:2px;background:red;}
+
+.center-dot{
+    width:10px;height:10px;background:#000;border-radius:50%;
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+}
+
+.date{
+    margin-top:6px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* CARD */
 .card{
-background:var(--card);
-padding:20px;
-border-radius:10px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    background:#fff;
+    padding:15px;
+    margin-top:80px;
+    border-radius:8px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.1);
 }
 
-.card h2{
-margin:0;
-font-size:28px;
-color:#3498db;
-}
-
-/* FORM */
+/* INPUT */
 input,select{
-padding:8px;
-margin:5px;
-border-radius:5px;
-border:1px solid #ccc;
+    padding:6px;margin:4px;width:70px;
 }
 
 /* BUTTON */
-button{
-padding:8px 12px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-color:white;
+.btn{
+    padding:6px 10px;margin:4px;border:none;color:#fff;cursor:pointer;
 }
-
-.btn-blue{background:#3498db;}
-.btn-green{background:#27ae60;}
-.btn-red{background:#e74c3c;}
-.btn-purple{background:#8e44ad;}
+.calc{background:green;}
+.clear{background:red;}
+.add{background:#007bff;}
+.export{background:orange;}
 
 /* TABLE */
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
+.output{
+    width:90%;
+    margin-top:15px;
+    border-collapse:collapse;
+    background:#fff;
+    font-size:11px;
 }
 
-th{
-background:#34495e;
-color:white;
-padding:10px;
+.output th{
+    background:#2c3e50;color:#fff;padding:5px;
 }
 
-td{
-padding:8px;
-text-align:center;
+.output td{
+    padding:4px;border:1px solid #ddd;text-align:center;
 }
 
-tr:nth-child(even){background:#eee;}
-
-body.dark tr:nth-child(even){background:#3a3a4a;}
-
-/* SEARCH */
-.search{
-margin:10px 0;
-padding:8px;
-width:250px;
-}
-
-/* IMAGE PREVIEW */
-.preview{
-max-width:100px;
-cursor:pointer;
-}
-
-.modal{
-display:none;
-position:fixed;
-top:0;left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-justify-content:center;
-align-items:center;
-}
-
-.modal img{
-max-width:80%;
+.delete-btn{
+    background:red;color:#fff;border:none;padding:3px 6px;
 }
 
 </style>
@@ -147,225 +195,148 @@ max-width:80%;
 
 <body>
 
-<header>
-<span>📊 Smart Management Dashboard</span>
-<button class="toggle" onclick="toggleMode()">🌙 Mode</button>
-</header>
+<div class="wrapper">
 
-<div class="container">
+<!-- LEFT RATE LIST -->
+<div class="sidebar">
 
-<!-- DASHBOARD -->
-<div class="dashboard">
-<div class="card"><h2 id="totalRates">0</h2>Total Rates</div>
-<div class="card"><h2 id="totalSuppliers">0</h2>Suppliers</div>
-<div class="card"><h2 id="totalCategories">0</h2>Categories</div>
-<div class="card"><h2 id="totalFiles">0</h2>Files</div>
-</div>
+<div class="header">Carton Calculation Rate</div>
 
-<!-- SEARCH -->
-<input class="search" id="search" placeholder="Search..." onkeyup="displayRates()">
+<table class="rate-table">
+<tr><th>Particular</th><th>Rate</th><th>Unit</th></tr>
 
-<!-- ADD RATE -->
-<div class="card">
-<h3>Add Rate</h3>
+<tr onclick="setRate(44.5)"><td>NORMAL 5 Ply BS 190 to 220</td><td>44.5</td><td>Per SQM</td></tr>
+<tr onclick="setRate(57)"><td>NORMAL 7 Ply BS 210 to 240</td><td>57</td><td>Per SQM</td></tr>
+<tr onclick="setRate(31.88)"><td>RHBC 3 Ply BS 140</td><td>31.88</td><td>Per SQM</td></tr>
+<tr onclick="setRate(52.25)"><td>RHBC 5 Ply BS 220 to 240</td><td>52.25</td><td>Per SQM</td></tr>
+<tr onclick="setRate(72.15)"><td>RHBC 7 Ply BS 275 to 290</td><td>72.15</td><td>Per SQM</td></tr>
+<tr onclick="setRate(48)"><td>Automatic 5 Ply BS 180 to 220</td><td>48</td><td>Per SQM</td></tr>
+<tr onclick="setRate(31.88)"><td>NORMAL 3 Ply BS 150</td><td>31.88</td><td>Per SQM</td></tr>
+<tr onclick="setRate(44.5)"><td>NORMAL 5 Ply BS 140 to 160</td><td>44.5</td><td>Per SQM</td></tr>
+<tr onclick="setRate(52.72)"><td>NORMAL 7 Ply BS 180 to 220</td><td>52.72</td><td>Per SQM</td></tr>
+<tr onclick="setRate(52.25)"><td>Automatic 5 Ply BS 240 to 260</td><td>52.25</td><td>Per SQM</td></tr>
+<tr onclick="setRate(40.25)"><td>WHITE INNER 3 PLY</td><td>40.25</td><td>Per SQM</td></tr>
 
-<select id="category"></select>
-<input id="supplier" placeholder="Supplier">
-<input id="item" placeholder="Item">
-<input id="rate" placeholder="Rate">
-
-<button class="btn-blue" onclick="addRate()">Add</button>
-</div>
-
-<!-- RATE TABLE -->
-<div class="card">
-<h3>Rate List</h3>
-<table id="rateTable">
-<thead>
-<tr>
-<th>Sr</th><th>Category</th><th>Supplier</th><th>Item</th><th>Rate</th><th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
 </table>
+
 </div>
 
-<!-- FILE UPLOAD -->
-<div class="card">
-<h3>Upload File</h3>
-<select id="fileCategory"></select>
-<input id="fileSupplier" placeholder="Supplier">
-<input type="file" id="fileInput">
-<button class="btn-blue" onclick="uploadFile()">Upload</button>
+<!-- MAIN -->
+<div class="main">
+
+<!-- CLOCK -->
+<div class="clock-box">
+<div class="analog-clock">
+
+<div class="number number12"><span>12</span></div>
+<div class="number number1"><span>1</span></div>
+<div class="number number2"><span>2</span></div>
+<div class="number number3"><span>3</span></div>
+<div class="number number4"><span>4</span></div>
+<div class="number number5"><span>5</span></div>
+<div class="number number6"><span>6</span></div>
+<div class="number number7"><span>7</span></div>
+<div class="number number8"><span>8</span></div>
+<div class="number number9"><span>9</span></div>
+<div class="number number10"><span>10</span></div>
+<div class="number number11"><span>11</span></div>
+
+<div class="hand hour" id="hour"></div>
+<div class="hand minute" id="minute"></div>
+<div class="hand second" id="second"></div>
+
+<div class="center-dot"></div>
+
+</div>
+<div class="date" id="date"></div>
 </div>
 
-<!-- FILE TABLE -->
+<!-- CALCULATOR -->
 <div class="card">
-<h3>Files</h3>
-<table id="fileTable">
-<thead>
-<tr>
-<th>Category</th><th>Supplier</th><th>File</th><th>Preview</th><th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
+<h3>📦 Box Calculator</h3>
+
+Unit:
+<select id="unit"><option value="inch">INCH</option><option value="cm">CM</option></select>
+
+Type:
+<select id="boxtype"><option value="normal">Normal</option><option value="cf">C/F</option></select>
+
+<br>
+
+L:<input id="l"> W:<input id="w"> H:<input id="h"><br>
+
+Rate:<input id="rate"> Print:<input id="print" value="3"><br>
+
+<button class="btn calc" onclick="calc()">Calculate</button>
+<button class="btn clear" onclick="clearAll()">Clear</button>
+<button class="btn add" onclick="addRow()">Add Row</button>
+<button class="btn export" onclick="exportExcel()">Export</button>
+</div>
+
+<table class="output" id="outputTable">
+<tr><th>S.No.</th><th>L</th><th>W</th><th>H</th><th>Type</th><th>Rate</th><th>Without</th><th>With</th><th>X</th></tr>
 </table>
-</div>
 
 </div>
-
-<!-- IMAGE MODAL -->
-<div class="modal" id="modal" onclick="this.style.display='none'">
-<img id="modalImg">
 </div>
 
 <script>
 
-let categories = JSON.parse(localStorage.getItem("categories")) || ["Foam","Wood"];
-let rates = JSON.parse(localStorage.getItem("rates")) || [];
-let files = JSON.parse(localStorage.getItem("files")) || [];
+let count=1;
 
-// DARK MODE
-function toggleMode(){
-document.body.classList.toggle("dark");
+function setRate(val){rate.value=val;}
+
+function updateClock(){
+let n=new Date();
+let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+
+hour.style.transform=`translateX(-50%) rotate(${(h%12)*30+m*0.5}deg)`;
+minute.style.transform=`translateX(-50%) rotate(${m*6}deg)`;
+second.style.transform=`translateX(-50%) rotate(${s*6}deg)`;
+
+date.innerText=n.toLocaleDateString("en-IN");
 }
+setInterval(updateClock,1000);
 
-// UPDATE DASHBOARD
-function updateDashboard(){
-document.getElementById("totalRates").innerText=rates.length;
-document.getElementById("totalSuppliers").innerText=new Set(rates.map(r=>r.supplier)).size;
-document.getElementById("totalCategories").innerText=categories.length;
-document.getElementById("totalFiles").innerText=files.length;
-}
+function calc(){
+let L=l.value,W=w.value,H=h.value;
+if(unit.value==="cm"){L/=2.54;W/=2.54;H/=2.54;}
 
-// CATEGORY
-function loadCategories(){
-let c1=document.getElementById("category");
-let c2=document.getElementById("fileCategory");
+let raw=(boxtype.value==="cf")?(2*W+H):(W+H);
+let WH=Math.ceil(raw); if(WH%2) WH++;
 
-c1.innerHTML=""; c2.innerHTML="";
-categories.forEach(c=>{
-c1.innerHTML+=`<option>${c}</option>`;
-c2.innerHTML+=`<option>${c}</option>`;
-});
-}
+let base=(2*(L+W+2)*WH)/1550;
 
-// ADD RATE
-function addRate(){
-let now=new Date();
-rates.push({
-category:category.value,
-supplier:supplier.value,
-item:item.value,
-rate:rate.value
-});
-localStorage.setItem("rates",JSON.stringify(rates));
-displayRates();
-updateDashboard();
-}
-
-// DISPLAY RATE
-function displayRates(){
-let search=document.getElementById("search").value.toLowerCase();
-let tbody=document.querySelector("#rateTable tbody");
-tbody.innerHTML="";
-let sr=1;
-
-rates.forEach((r,i)=>{
-if(r.item.toLowerCase().includes(search)||r.supplier.toLowerCase().includes(search)){
-tbody.innerHTML+=`
-<tr>
-<td>${sr++}</td>
-<td>${r.category}</td>
-<td>${r.supplier}</td>
-<td>${r.item}</td>
-<td>${r.rate}</td>
-<td><button class="btn-red" onclick="deleteRate(${i})">Delete</button></td>
-</tr>`;
-}
-});
-}
-
-// DELETE RATE
-function deleteRate(i){
-rates.splice(i,1);
-localStorage.setItem("rates",JSON.stringify(rates));
-displayRates();
-updateDashboard();
-}
-
-// UPLOAD FILE
-function uploadFile(){
-let file=fileInput.files[0];
-let reader=new FileReader();
-
-reader.onload=function(e){
-files.push({
-category:fileCategory.value,
-supplier:fileSupplier.value,
-name:file.name,
-data:e.target.result
-});
-localStorage.setItem("files",JSON.stringify(files));
-displayFiles();
-updateDashboard();
+return {
+w:(base*rate.value).toFixed(2),
+p:(base*rate.value+ +print.value).toFixed(2)
 };
-reader.readAsDataURL(file);
 }
 
-// DISPLAY FILES
-function displayFiles(){
-let tbody=document.querySelector("#fileTable tbody");
-tbody.innerHTML="";
+function addRow(){
+let r=calc();
+let row=outputTable.insertRow();
 
-files.forEach((f,i)=>{
-let preview="";
-if(f.data.includes("image")){
-preview=`<img src="${f.data}" class="preview" onclick="showImg('${f.data}')">`;
+row.insertCell(0).innerText=count++;
+row.insertCell(1).innerText=l.value;
+row.insertCell(2).innerText=w.value;
+row.insertCell(3).innerText=h.value;
+row.insertCell(4).innerText=boxtype.value;
+row.insertCell(5).innerText=rate.value;
+row.insertCell(6).innerText=r.w;
+row.insertCell(7).innerText=r.p;
+
+row.insertCell(8).innerHTML="<button class='delete-btn' onclick='this.parentElement.parentElement.remove()'>X</button>";
 }
 
-tbody.innerHTML+=`
-<tr>
-<td>${f.category}</td>
-<td>${f.supplier}</td>
-<td>${f.name}</td>
-<td>${preview}</td>
-<td>
-<button class="btn-blue" onclick="downloadFile(${i})">DL</button>
-<button class="btn-red" onclick="deleteFile(${i})">X</button>
-</td>
-</tr>`;
-});
-}
+function clearAll(){l.value=w.value=h.value=rate.value="";}
 
-// IMAGE POPUP
-function showImg(src){
-document.getElementById("modal").style.display="flex";
-document.getElementById("modalImg").src=src;
-}
-
-// DOWNLOAD
-function downloadFile(i){
-let f=files[i];
+function exportExcel(){
 let a=document.createElement("a");
-a.href=f.data;
-a.download=f.name;
+a.href='data:application/vnd.ms-excel,'+encodeURIComponent(outputTable.outerHTML);
+a.download='carton.xls';
 a.click();
 }
-
-// DELETE FILE
-function deleteFile(i){
-files.splice(i,1);
-localStorage.setItem("files",JSON.stringify(files));
-displayFiles();
-updateDashboard();
-}
-
-// INIT
-loadCategories();
-displayRates();
-displayFiles();
-updateDashboard();
 
 </script>
 
