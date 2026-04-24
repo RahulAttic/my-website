@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rate Management System</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.container {
+    width: 90%;
+    margin: 20px auto;
+}
+
+select, input, button {
+    padding: 8px;
+    margin: 5px;
+}
+
+button {
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.export-btn {
+    background: green;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th {
+    background: #34495e;
+    color: white;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+.delete-btn {
+    background: red;
+}
+</style>
+</head>
+
+<body>
+
+<header>Rate Management System</header>
+
+<div class="container">
+
+    <h3>Add New Rate</h3>
+
+    <!-- Category Filter -->
+    <select id="category" onchange="displayRates()">
+        <option value="All">All Category</option>
+        <option>Foam</option>
+        <option>Corrugated Box</option>
+        <option>Wood</option>
+        <option>Chemical</option>
+        <option>Hardware</option>
+    </select>
+
+    <!-- Supplier Filter -->
+    <select id="supplierFilter" onchange="displayRates()">
+        <option value="All">All Supplier</option>
+    </select>
+
+    <br>
+
+    <input type="text" id="supplier" placeholder="Supplier Name">
+    <input type="text" id="item" placeholder="Item Name">
+    <input type="number" id="rate" placeholder="Rate">
+
+    <button onclick="addRate()">Add</button>
+    <button class="export-btn" onclick="exportData()">Export Excel</button>
+
+    <h3>Rate List</h3>
+
+    <table id="rateTable">
+        <thead>
+            <tr>
+                <th>Sr. No.</th>
+                <th>Category</th>
+                <th>Supplier</th>
+                <th>Item</th>
+                <th>Rate</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+</div>
+
+<script>
+
+let rates = JSON.parse(localStorage.getItem("rates")) || [];
+
+function saveData() {
+    localStorage.setItem("rates", JSON.stringify(rates));
+}
+
+// Add Data
+function addRate() {
+    let category = document.getElementById("category").value;
+    let supplier = document.getElementById("supplier").value;
+    let item = document.getElementById("item").value;
+    let rate = document.getElementById("rate").value;
+
+    if (supplier === "" || item === "" || rate === "") {
+        alert("Please fill all fields");
+        return;
+    }
+
+    rates.push({ category, supplier, item, rate });
+    saveData();
+
+    updateSupplierDropdown();
+    displayRates();
+
+    document.getElementById("supplier").value = "";
+    document.getElementById("item").value = "";
+    document.getElementById("rate").value = "";
+}
+
+// Delete
+function deleteRate(index) {
+    rates.splice(index, 1);
+    saveData();
+    updateSupplierDropdown();
+    displayRates();
+}
+
+// Display Data
+function displayRates() {
+    let selectedCategory = document.getElementById("category").value;
+    let selectedSupplier = document.getElementById("supplierFilter").value;
+
+    let table = document.querySelector("#rateTable tbody");
+    table.innerHTML = "";
+
+    let sr = 1;
+
+    rates.forEach((data, index) => {
+
+        if (
+            (selectedCategory === "All" || data.category === selectedCategory) &&
+            (selectedSupplier === "All" || data.supplier === selectedSupplier)
+        ) {
+            let row = `
+                <tr>
+                    <td>${sr++}</td>
+                    <td>${data.category}</td>
+                    <td>${data.supplier}</td>
+                    <td>${data.item}</td>
+                    <td>${data.rate}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteRate(${index})">Delete</button>
+                    </td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        }
+    });
+}
+
+// Supplier Dropdown Update
+function updateSupplierDropdown() {
+    let supplierSet = new Set();
+
+    rates.forEach(data => supplierSet.add(data.supplier));
+
+    let dropdown = document.getElementById("supplierFilter");
+    dropdown.innerHTML = '<option value="All">All Supplier</option>';
+
+    supplierSet.forEach(supplier => {
+        dropdown.innerHTML += `<option>${supplier}</option>`;
+    });
+}
+
+// Export
+function exportData() {
+    let selectedCategory = document.getElementById("category").value;
+    let selectedSupplier = document.getElementById("supplierFilter").value;
+
+    let csv = "Sr No,Category,Supplier,Item,Rate\n";
+    let sr = 1;
+
+    rates.forEach(data => {
+        if (
+            (selectedCategory === "All" || data.category === selectedCategory) &&
+            (selectedSupplier === "All" || data.supplier === selectedSupplier)
+        ) {
+            csv += `${sr++},${data.category},${data.supplier},${data.item},${data.rate}\n`;
+        }
+    });
+
+    let blob = new Blob([csv], { type: "text/csv" });
+    let url = window.URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "rate_list.csv";
+    a.click();
+}
+
+// Init
+updateSupplierDropdown();
+displayRates();
+
+</script>
+
+</body>
+</html>
