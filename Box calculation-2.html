@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Carton Calculation Software</title>
+
+<style>
+
+/* BACKGROUND */
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(120deg,#e0eafc,#cfdef3);
+}
+
+/* LAYOUT */
+.wrapper{
+    display:flex;
+    height:100vh;
+}
+
+/* LEFT PANEL FIX */
+.sidebar{
+    width:450px;
+    background:#fff;
+    border-right:2px solid #ddd;
+    height:100vh;
+    overflow-y:auto;
+}
+
+/* HEADER */
+.header{
+    background:#ffc107;
+    padding:12px;
+    text-align:center;
+    font-weight:bold;
+    position:sticky;
+    top:0;
+}
+
+/* RATE TABLE */
+.rate-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    table-layout:fixed;
+}
+
+.rate-table th{
+    background:#343a40;
+    color:#fff;
+    padding:8px;
+    position:sticky;
+    top:42px;
+}
+
+.rate-table td{
+    padding:6px;
+    border:1px solid #ddd;
+}
+
+.rate-table tr:hover{
+    background:#eef7ff;
+    cursor:pointer;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* CLOCK RIGHT */
+.clock-box{
+    position:absolute;
+    top:15px;
+    right:20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* CLOCK */
+.analog-clock{
+    width:190px;
+    height:190px;
+    border:5px solid #2c3e50;
+    border-radius:50%;
+    position:relative;
+    background:#fff;
+}
+
+/* NUMBERS */
+.number{
+    position:absolute;
+    width:100%;
+    height:100%;
+    text-align:center;
+    transform-origin:center;
+    font-weight:bold;
+}
+
+.number span{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.number12{transform:rotate(0deg);}
+.number1{transform:rotate(30deg);}
+.number2{transform:rotate(60deg);}
+.number3{transform:rotate(90deg);}
+.number4{transform:rotate(120deg);}
+.number5{transform:rotate(150deg);}
+.number6{transform:rotate(180deg);}
+.number7{transform:rotate(210deg);}
+.number8{transform:rotate(240deg);}
+.number9{transform:rotate(270deg);}
+.number10{transform:rotate(300deg);}
+.number11{transform:rotate(330deg);}
+
+/* HANDS */
+.hand{
+    position:absolute;
+    bottom:50%;
+    left:50%;
+    transform-origin:bottom;
+    transform:translateX(-50%);
+}
+
+.hour{height:50px;width:5px;background:#000;}
+.minute{height:65px;width:3px;background:#333;}
+.second{height:75px;width:2px;background:red;}
+
+.center-dot{
+    width:10px;height:10px;background:#000;border-radius:50%;
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+}
+
+.date{
+    margin-top:6px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* CARD */
+.card{
+    background:#fff;
+    padding:15px;
+    margin-top:80px;
+    border-radius:8px;
+    box-shadow:0 3px 12px rgba(0,0,0,0.1);
+}
+
+/* INPUT */
+input,select{
+    padding:6px;margin:4px;width:70px;
+}
+
+/* BUTTON */
+.btn{
+    padding:6px 10px;margin:4px;border:none;color:#fff;cursor:pointer;
+}
+.calc{background:green;}
+.clear{background:red;}
+.add{background:#007bff;}
+.export{background:orange;}
+
+/* TABLE */
+.output{
+    width:90%;
+    margin-top:15px;
+    border-collapse:collapse;
+    background:#fff;
+    font-size:11px;
+}
+
+.output th{
+    background:#2c3e50;color:#fff;padding:5px;
+}
+
+.output td{
+    padding:4px;border:1px solid #ddd;text-align:center;
+}
+
+.delete-btn{
+    background:red;color:#fff;border:none;padding:3px 6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<!-- LEFT RATE LIST -->
+<div class="sidebar">
+
+<div class="header">Carton Calculation Rate</div>
+
+<table class="rate-table">
+<tr><th>Particular</th><th>Rate</th><th>Unit</th></tr>
+
+<tr onclick="setRate(44.5)"><td>NORMAL 5 Ply BS 190 to 220</td><td>44.5</td><td>Per SQM</td></tr>
+<tr onclick="setRate(57)"><td>NORMAL 7 Ply BS 210 to 240</td><td>57</td><td>Per SQM</td></tr>
+<tr onclick="setRate(31.88)"><td>RHBC 3 Ply BS 140</td><td>31.88</td><td>Per SQM</td></tr>
+<tr onclick="setRate(52.25)"><td>RHBC 5 Ply BS 220 to 240</td><td>52.25</td><td>Per SQM</td></tr>
+<tr onclick="setRate(72.15)"><td>RHBC 7 Ply BS 275 to 290</td><td>72.15</td><td>Per SQM</td></tr>
+<tr onclick="setRate(48)"><td>Automatic 5 Ply BS 180 to 220</td><td>48</td><td>Per SQM</td></tr>
+<tr onclick="setRate(31.88)"><td>NORMAL 3 Ply BS 150</td><td>31.88</td><td>Per SQM</td></tr>
+<tr onclick="setRate(44.5)"><td>NORMAL 5 Ply BS 140 to 160</td><td>44.5</td><td>Per SQM</td></tr>
+<tr onclick="setRate(52.72)"><td>NORMAL 7 Ply BS 180 to 220</td><td>52.72</td><td>Per SQM</td></tr>
+<tr onclick="setRate(52.25)"><td>Automatic 5 Ply BS 240 to 260</td><td>52.25</td><td>Per SQM</td></tr>
+<tr onclick="setRate(40.25)"><td>WHITE INNER 3 PLY</td><td>40.25</td><td>Per SQM</td></tr>
+
+</table>
+
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- CLOCK -->
+<div class="clock-box">
+<div class="analog-clock">
+
+<div class="number number12"><span>12</span></div>
+<div class="number number1"><span>1</span></div>
+<div class="number number2"><span>2</span></div>
+<div class="number number3"><span>3</span></div>
+<div class="number number4"><span>4</span></div>
+<div class="number number5"><span>5</span></div>
+<div class="number number6"><span>6</span></div>
+<div class="number number7"><span>7</span></div>
+<div class="number number8"><span>8</span></div>
+<div class="number number9"><span>9</span></div>
+<div class="number number10"><span>10</span></div>
+<div class="number number11"><span>11</span></div>
+
+<div class="hand hour" id="hour"></div>
+<div class="hand minute" id="minute"></div>
+<div class="hand second" id="second"></div>
+
+<div class="center-dot"></div>
+
+</div>
+<div class="date" id="date"></div>
+</div>
+
+<!-- CALCULATOR -->
+<div class="card">
+<h3>📦 Box Calculator</h3>
+
+Unit:
+<select id="unit"><option value="inch">INCH</option><option value="cm">CM</option></select>
+
+Type:
+<select id="boxtype"><option value="normal">Normal</option><option value="cf">C/F</option></select>
+
+<br>
+
+L:<input id="l"> W:<input id="w"> H:<input id="h"><br>
+
+Rate:<input id="rate"> Print:<input id="print" value="3"><br>
+
+<button class="btn calc" onclick="calc()">Calculate</button>
+<button class="btn clear" onclick="clearAll()">Clear</button>
+<button class="btn add" onclick="addRow()">Add Row</button>
+<button class="btn export" onclick="exportExcel()">Export</button>
+</div>
+
+<table class="output" id="outputTable">
+<tr><th>S.No.</th><th>L</th><th>W</th><th>H</th><th>Type</th><th>Rate</th><th>Without</th><th>With</th><th>X</th></tr>
+</table>
+
+</div>
+</div>
+
+<script>
+
+let count=1;
+
+function setRate(val){rate.value=val;}
+
+function updateClock(){
+let n=new Date();
+let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+
+hour.style.transform=`translateX(-50%) rotate(${(h%12)*30+m*0.5}deg)`;
+minute.style.transform=`translateX(-50%) rotate(${m*6}deg)`;
+second.style.transform=`translateX(-50%) rotate(${s*6}deg)`;
+
+date.innerText=n.toLocaleDateString("en-IN");
+}
+setInterval(updateClock,1000);
+
+function calc(){
+let L=l.value,W=w.value,H=h.value;
+if(unit.value==="cm"){L/=2.54;W/=2.54;H/=2.54;}
+
+let raw=(boxtype.value==="cf")?(2*W+H):(W+H);
+let WH=Math.ceil(raw); if(WH%2) WH++;
+
+let base=(2*(L+W+2)*WH)/1550;
+
+return {
+w:(base*rate.value).toFixed(2),
+p:(base*rate.value+ +print.value).toFixed(2)
+};
+}
+
+function addRow(){
+let r=calc();
+let row=outputTable.insertRow();
+
+row.insertCell(0).innerText=count++;
+row.insertCell(1).innerText=l.value;
+row.insertCell(2).innerText=w.value;
+row.insertCell(3).innerText=h.value;
+row.insertCell(4).innerText=boxtype.value;
+row.insertCell(5).innerText=rate.value;
+row.insertCell(6).innerText=r.w;
+row.insertCell(7).innerText=r.p;
+
+row.insertCell(8).innerHTML="<button class='delete-btn' onclick='this.parentElement.parentElement.remove()'>X</button>";
+}
+
+function clearAll(){l.value=w.value=h.value=rate.value="";}
+
+function exportExcel(){
+let a=document.createElement("a");
+a.href='data:application/vnd.ms-excel,'+encodeURIComponent(outputTable.outerHTML);
+a.download='carton.xls';
+a.click();
+}
+
+</script>
+
+</body>
+</html>
