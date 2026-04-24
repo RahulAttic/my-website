@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Box Calculator with Rate List</title>
+
+<style>
+body { font-family: Arial; background:#f2f2f2; padding:20px; }
+.container {
+    max-width:700px; margin:auto; background:#fff;
+    padding:20px; border-radius:10px;
+}
+.top {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+input, select {
+    padding:6px; margin:5px;
+}
+button {
+    padding:10px; background:green; color:#fff;
+    border:none; cursor:pointer;
+}
+table { width:100%; margin-top:15px; }
+td { padding:6px; border-bottom:1px solid #ccc; }
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="top">
+<h3>📦 Carton Calculation</h3>
+
+<select id="rateList" onchange="setRate()">
+<option value="">-- Select Box Type --</option>
+
+<option value="44.5">NORMAL 5 Ply BS 190 to 220 - 44.5</option>
+<option value="57">NORMAL 7 Ply BS 210 to 240 - 57</option>
+<option value="31.88">RHBC 3 Ply BS 140 - 31.88</option>
+<option value="52.25">RHBC 5 Ply BS 220 to 240 - 52.25</option>
+<option value="72.15">RHBC 7 Ply BS 275 to 290 - 72.15</option>
+<option value="48">Automatic 5 Ply BS 180 to 220 - 48</option>
+<option value="31.88">NORMAL 3 Ply BS 150 - 31.88</option>
+<option value="44.5">NORMAL 5 Ply BS 140 to 160 - 44.5</option>
+<option value="52.72">NORMAL 7 Ply BS 180 to 220 - 52.72</option>
+<option value="52.25">Automatic 5 Ply BS 240 to 260 - 52.25</option>
+<option value="40.25">WHITE INNER 3 PLY - 40.25</option>
+
+</select>
+
+</div>
+
+<hr>
+
+Unit:
+<select id="unit">
+<option value="inch">INCH</option>
+<option value="cm">CM</option>
+</select>
+
+<br>
+
+L: <input id="l" value="49">
+W: <input id="w" value="31">
+H: <input id="h" value="27">
+
+<br>
+
+Rate (₹/SQM): <input id="rate" value="44.5">
+
+<br>
+
+Printing Cost: <input id="print" value="3">
+
+<br>
+
+<button onclick="calc()">Calculate</button>
+
+<table>
+<tr><td>(W+H) Even</td><td id="wh"></td></tr>
+<tr><td>Base Cost</td><td id="base"></td></tr>
+<tr><td><b>Total Cost</b></td><td id="total"></td></tr>
+</table>
+
+</div>
+
+<script>
+
+// Set rate from dropdown
+function setRate(){
+    let rate = document.getElementById("rateList").value;
+    document.getElementById("rate").value = rate;
+}
+
+function calc(){
+
+let unit = document.getElementById("unit").value;
+
+let L = parseFloat(document.getElementById("l").value);
+let W = parseFloat(document.getElementById("w").value);
+let H = parseFloat(document.getElementById("h").value);
+
+// Convert CM → INCH
+if(unit === "cm"){
+    L = L / 2.54;
+    W = W / 2.54;
+    H = H / 2.54;
+}
+
+// W + H EVEN LOGIC
+let WH = Math.ceil(W + H);
+
+if(WH % 2 !== 0){
+    WH = WH + 1;
+}
+
+document.getElementById("wh").innerText = WH;
+
+// Formula
+let base = (2 * (L + W + 2) * WH) / 1550;
+
+let rate = parseFloat(document.getElementById("rate").value);
+
+let cost = base * rate;
+
+document.getElementById("base").innerText = cost.toFixed(2);
+
+// Printing
+let print = parseFloat(document.getElementById("print").value);
+
+let total = cost + print;
+
+document.getElementById("total").innerText = total.toFixed(2);
+
+}
+
+</script>
+
+</body>
+</html>
